@@ -26,11 +26,11 @@ A simple and automatic script to obtain free SSL certificates from Let’s Encry
 
 2. Download the script directly:  
    ```
-   curl -O https://raw.githubusercontent.com/monhacer/AutoSSL/main/AutoSSL.sh
+   curl -4 -O https://raw.githubusercontent.com/monhacer/AutoSSL/main/AutoSSL.sh
    ```
    or  
    ```
-   wget https://raw.githubusercontent.com/monhacer/AutoSSL/main/AutoSSL.sh
+   wget -4 https://raw.githubusercontent.com/monhacer/AutoSSL/main/AutoSSL.sh
    ```
 
 3. Make it executable:  
@@ -59,7 +59,7 @@ To view cron jobs, run:
 
 # One-Command installer
    ```
-   wget https://raw.githubusercontent.com/monhacer/AutoSSL/main/AutoSSL.sh
+   wget -4 https://raw.githubusercontent.com/monhacer/AutoSSL/main/AutoSSL.sh
    chmod +x AutoSSL.sh
    sudo ./AutoSSL.sh
    ```
