@@ -3,11 +3,27 @@
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 if [[ $EUID -ne 0 ]]; then
    echo -e "${RED}This script must be run as root.${NC}"
    exit 1
+fi
+
+if ! command -v socat &> /dev/null; then
+    echo -e "${YELLOW}socat is not installed. Attempting to install it...${NC}"
+    if command -v apt &> /dev/null; then
+        apt update && apt install socat -y
+    elif command -v yum &> /dev/null; then
+        yum install socat -y
+    elif command -v dnf &> /dev/null; then
+        dnf install socat -y
+    elif command -v pacman &> /dev/null; then
+        pacman -Sy socat --noconfirm
+    else
+        echo -e "${RED}Could not detect package manager. Please install socat manually.${NC}"
+        exit 1
+    fi
 fi
 
 echo -e "${GREEN}Installing acme.sh ...${NC}"
@@ -28,6 +44,19 @@ mkdir -p "$SSL_DIR"
 ~/.acme.sh/acme.sh --install-cert -d "$DOMAIN" \
 --key-file "$SSL_DIR/private.pem" \
 --fullchain-file "$SSL_DIR/public.pem"
+
+echo -e "${GREEN}Certificate installed.${NC}"
+
+SERVICES=("nginx" "apache2" "httpd" "haproxy")
+for SERVICE in "${SERVICES[@]}"; do
+    if systemctl list-units --type=service --all | grep -q "$SERVICE.service"; then
+        echo -e "${YELLOW}Restarting $SERVICE service...${NC}"
+        systemctl restart "$SERVICE"
+        systemctl is-active "$SERVICE" &>/dev/null && \
+            echo -e "${GREEN}$SERVICE restarted successfully.${NC}" || \
+            echo -e "${RED}Failed to restart $SERVICE.${NC}"
+    fi
+done
 
 echo -e "${GREEN}Done!${NC}"
 echo -e "${YELLOW}Private key: $SSL_DIR/private.pem${NC}"
