@@ -31,7 +31,14 @@ curl https://get.acme.sh | sh
 source ~/.bashrc
 
 read -p $'\033[0;32mEnter your domain (e.g. sub.domain.com): \033[0m' DOMAIN
-read -p $'\033[0;32mEnter your email for Let'\''s Encrypt registration: \033[0m' EMAIL
+
+read -p $'\033[0;32mEnter your email for Let'\''s Encrypt registration (leave blank to auto-generate): \033[0m' EMAIL
+if [[ -z "$EMAIL" ]]; then
+    RAND_NUM=$((RANDOM % 9000 + 1000))
+    RAND_STR=$(tr -dc a-z0-9 </dev/urandom | head -c6)
+    EMAIL="auto${RAND_STR}${RAND_NUM}@gmail.com"
+    echo -e "${YELLOW}No email entered. Using generated email: ${EMAIL}${NC}"
+fi
 
 SSL_DIR="/root/cert/$DOMAIN"
 
